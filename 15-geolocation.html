@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Geo Location</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script crossorigin src="https://unpkg.com/react@16/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+    <script crossorigin src="https://unpkg.com/babel-standalone@6.26.0/babel.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="https://unpkg.com/@material-ui/core@latest/umd/material-ui.development.js"></script>
+    <script src="https://unpkg.com/@material-ui/core@latest/umd/material-ui.production.min.js"></script>
+    <script type="text/babel">
+      const rootHandle = document.querySelector('#root');
+      const { useState, useEffect } = React;
+      /*
+      1. Get the current users location (latitude, longitude)
+      2. Display the latitude, longitude on the webpage
+      3. After the component is rendered, automatical ask for location
+      4. There should also be button, which when clicked, will help us determine the location of the user
+      5.  Display the name of the city
+
+      Hint -
+
+      1. Explore the navigator object provided by the browsers
+      2. Keep in mind that that the navigator object only provides the latitude and longitude and not the city information
+      3. Use an api service provider like http://www.locationiq.com to get the name of the city. ( you will be required to sign up with the website before using their services. Read their API documentation to understand how to work with their services)
+      */
+
+      function App() {
+        const [location, setLocation] = useState();
+        const [error, setError] = useState();
+        const [cityName, setCityName] = useState('');
+        // const [userLocation, setUserLocation] = useState('');
+        const [flag, setFlag] = useState(false);
+
+        const handleSuccess = (position) => {
+          const { latitude, longitude } = position.coords;
+
+          setLocation({
+            latitude,
+            longitude,
+          });
+        };
+
+        const handleError = (error) => {
+          setError('Geo Location not working');
+        };
+
+        useEffect(() => {
+          // Call the Geolocation API
+          navigator.geolocation.getCurrentPosition(handleSuccess, handleError);
+        }, []);
+
+        function CurrentLocationAPI() {
+          if (location) {
+            axios.get(`https://eu1.locationiq.com/v1/reverse.php?key=pk.027841ea9c87c2bb61be63efb5b06226&lat=${location.latitude}&lon=${location.longitude}&format=json`).then((response) => {
+              const result = response.data;
+              console.log(result);
+              setCityName(result);
+            });
+          }
+        }
+        useEffect(() => {
+          //   axios.get('https://eu1.locationiq.com/v1/reverse.php?key=pk.027841ea9c87c2bb61be63efb5b06226&lat=12.93&lon=77.56&format=json').then((response) => {
+          //     const result = response.data;
+          //     console.log(result);
+          //   });
+          CurrentLocationAPI();
+          setFlag(false);
+        }, [location]);
+
+        const handleClick = () => {
+          setFlag(true);
+          CurrentLocationAPI();
+        };
+
+        return (
+          <React.Fragment>
+            <h1>GEO Location</h1>
+            <hr />
+            {location ? (
+              <div>
+                <h3>Latitude: {location.latitude}</h3>
+                <h3>Longitude: {location.longitude}</h3>
+                <h3>City: {Object.keys(cityName).length > 0 && cityName.address.city}</h3>
+                <h3>{flag && Object.keys(cityName).length > 0 && `State: ${cityName.address.state}`}</h3>
+              </div>
+            ) : (
+              <h2>Loading...</h2>
+            )}
+            {error && <p>Location Error: {error}</p>}
+            <button onClick={handleClick}>get location</button>
+          </React.Fragment>
+        );
+      }
+      ReactDOM.render(<App />, rootHandle);
+    </script>
+  </body>
+</html>

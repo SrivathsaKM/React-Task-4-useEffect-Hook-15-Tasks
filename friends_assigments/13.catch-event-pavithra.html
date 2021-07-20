@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Users Table</title>
+  </head>
+  <body>
+    <div id="root"></div>
+
+    <script crossorigin src="https://unpkg.com/react@16/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+    <script crossorigin src="https://unpkg.com/babel-standalone@6.26.0/babel.js"></script>
+    <script crossorigin src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+    <script type="text/babel">
+      const rootHandle = document.getElementById('root');
+
+      const { useState, useEffect } = React;
+
+      function CatchEvents(props) {
+        const [random, setRandom] = useState();
+        const [status, setStatus] = useState(false);
+        //const [count, setCount] = useState(0);
+        const [randomNumber, setrandomNumber] = useState([]);
+
+        useEffect(() => {
+          // setTimeout(function generateRandom() {
+          //   const number = Math.floor(Math.random() * 100);
+          //   setRandom(number);
+          // }, 1000);
+          setTimeout(() => {
+            const number = Math.floor(Math.random() * 100);
+            setRandom(number);
+          }, 2000);
+        }, [random]);
+
+        useEffect(() => {
+          if (random % 2 === 0) {
+            const result = [...randomNumber, random];
+            // console.log(result);
+            setrandomNumber(result);
+          }
+        }, [random]);
+
+        return (
+          <div>
+            <h3>{random}</h3>
+            <h3>Even numbers -{randomNumber.length}</h3>
+            <ul>
+              {randomNumber.map((ele, idx) => (
+                <li key={idx}>{ele}</li>
+              ))}
+            </ul>
+          </div>
+        );
+      }
+      ReactDOM.render(<CatchEvents />, rootHandle);
+    </script>
+  </body>
+</html>

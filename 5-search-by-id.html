@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Search By Id</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script crossorigin src="https://unpkg.com/react@16/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+    <script crossorigin src="https://unpkg.com/babel-standalone@6.26.0/babel.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="https://unpkg.com/@material-ui/core@latest/umd/material-ui.development.js"></script>
+    <script src="https://unpkg.com/@material-ui/core@latest/umd/material-ui.production.min.js"></script>
+    <script type="text/babel">
+      /*
+          1. The user is provided with a form, where he can input the user id and get the data from the API Server
+          2. Fetch only the user by the id from the provided API using the axios package.
+          3. Display it's data like the name, email and city below
+      */
+      const rootHandle = document.querySelector('#root');
+      const { useState, useEffect } = React;
+      const { makeStyles, Container, TextField, Button, Table, TableContainer, TableHead, TableCell, TableRow, TableBody, Paper, Typography } = MaterialUI;
+
+      const useStyles = makeStyles((theme) => ({
+        root: {
+          '& > *': {
+            margin: theme.spacing(0.5),
+            width: '25ch',
+          },
+        },
+      }));
+
+      const UserList = (props) => {
+        // console.log(props.data);
+        const { classes, data } = props;
+        return (
+          <React.Fragment>
+            <Container fixed>
+              <TableContainer component={Paper}>
+                <Table className={classes.table} aria-label='simple table'>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>#</TableCell>
+                      <TableCell>Name</TableCell>
+                      <TableCell>Email</TableCell>
+                      <TableCell>City</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    <TableRow key={data.id}>
+                      <TableCell component='th' scope='row'>
+                        {data.id}
+                      </TableCell>
+                      <TableCell>{data.name}</TableCell>
+                      <TableCell>{data.email}</TableCell>
+                      <TableCell>{data.address.city}</TableCell>
+                    </TableRow>
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </Container>
+          </React.Fragment>
+        );
+      };
+
+      function FetchUser() {
+        const [users, setUsers] = useState('');
+        const [data, setData] = useState({});
+        const [flag, setFlag] = useState(false);
+        // const [status, setStatus] = useState(false);
+
+        const classes = useStyles();
+
+        const handleChange = (e) => {
+          setUsers(e.target.value);
+        };
+
+        const handleSubmit = (e) => {
+          e.preventDefault();
+          console.log(users);
+          if (users <= 10) {
+            axios
+              .get(`https://jsonplaceholder.typicode.com/users/${users}`)
+              .then((response) => {
+                const result = response.data;
+                //console.log(result);\
+                setFlag(false);
+                setData(result);
+                setUsers('');
+              })
+              .catch((error) => {
+                console.log('error');
+              });
+          } else {
+            setFlag(true);
+            setUsers('');
+          }
+        };
+
+        return (
+          <React.Fragment>
+            <form className={classes.root} noValidate autoComplete='off' onSubmit={handleSubmit}>
+              <TextField id='outlined-basic' label='Search Id' variant='outlined' type='number' value={users} onChange={handleChange} />
+              <Button variant='contained' color='primary' style={{ height: '4em', width: '5em' }} type='submit'>
+                Search
+              </Button>
+              <br />
+            </form>
+            {Object.keys(data).length > 0 && flag === false ? (
+              <UserList data={data} classes={classes} />
+            ) : flag ? (
+              <Typography variant='h6' color='error'>
+                Id not Found
+              </Typography>
+            ) : (
+              <Typography variant='h6' color='primary'>
+                Enter Valid ID
+              </Typography>
+            )}
+          </React.Fragment>
+        );
+      }
+      ReactDOM.render(<FetchUser />, rootHandle);
+    </script>
+  </body>
+</html>

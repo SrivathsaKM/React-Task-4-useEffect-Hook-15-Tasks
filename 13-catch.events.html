@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Catch Events</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script crossorigin src="https://unpkg.com/react@16/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+    <script crossorigin src="https://unpkg.com/babel-standalone@6.26.0/babel.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="https://unpkg.com/@material-ui/core@latest/umd/material-ui.development.js"></script>
+    <script src="https://unpkg.com/@material-ui/core@latest/umd/material-ui.production.min.js"></script>
+    <script type="text/babel">
+      const rootHandle = document.querySelector('#root');
+
+      /*
+        1. Every second generate a random number between 1 - 100 (hint - explore the setInterval & setTimeout functions)
+        2. Display the randomly generate number
+        3. If the number generated is an even number, catch it and display as a list
+        4. Also show the count of even numbers
+      */
+      const { useState, useEffect } = React;
+
+      function App() {
+        const [randomNum, setRandomNum] = useState();
+        const [evenNum, setEvenNum] = useState([]);
+
+        useEffect(() => {
+          setInterval(() => {
+            const num = Math.floor(Math.random() * 100);
+            //  console.log(num);
+            setRandomNum(num);
+          }, 2000);
+        }, []);
+
+        useEffect(() => {
+          if (randomNum % 2 == 0) {
+            const num = [...evenNum, randomNum];
+            //console.log(num);
+            setEvenNum(num);
+          }
+        }, [randomNum]);
+
+        const stopInterval = () => {
+          setRandomNum();
+          setEvenNum([]);
+        };
+
+        return (
+          <React.Fragment>
+            <div>
+              <h1>{randomNum}</h1>
+              <button onClick={stopInterval}>Clear</button>
+              <h2>All Even Numbers - {evenNum.length}</h2>
+              <ul>
+                {evenNum.map((ele, idx) => {
+                  return <li key={idx}>{ele}</li>;
+                })}
+              </ul>
+            </div>
+          </React.Fragment>
+        );
+      }
+
+      ReactDOM.render(<App />, rootHandle);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Persisstent Form</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script crossorigin src="https://unpkg.com/react@16/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+    <script crossorigin src="https://unpkg.com/babel-standalone@6.26.0/babel.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="https://unpkg.com/@material-ui/core@latest/umd/material-ui.development.js"></script>
+    <script src="https://unpkg.com/@material-ui/core@latest/umd/material-ui.production.min.js"></script>
+    <script type="text/babel">
+      const rootHandle = document.querySelector('#root');
+      const { useState, useEffect } = React;
+      const { makeStyles, TextField, Button, Typography } = MaterialUI;
+      const useStyles = makeStyles((theme) => ({
+        root: {
+          '& > *': {
+            display: 'flex',
+          },
+        },
+        bodyText: {
+          marginRight: theme.spacing(1),
+          marginTop: theme.spacing(3),
+          width: '50ch',
+        },
+        titleText: {
+          width: '30ch',
+        },
+      }));
+
+      function App() {
+        const [title, setTitle] = useState(JSON.parse(localStorage.getItem('form')) || []);
+        const [body, setBody] = useState(JSON.parse(localStorage.getItem('formbody')) || []);
+        const [flag, setFlag] = useState(false);
+        const classes = useStyles();
+
+        const handleTitleChange = (e) => {
+          const titleInput = e.target.value;
+          setTitle(titleInput);
+          localStorage.setItem('form', JSON.stringify([titleInput]));
+        };
+        const handleBodyChange = (e) => {
+          const bodyInput = e.target.value;
+          setBody(bodyInput);
+          localStorage.setItem('formbody', JSON.stringify([bodyInput]));
+        };
+        const handleSubmit = (e) => {
+          e.preventDefault();
+          localStorage.clear();
+          setTitle([]);
+          setBody([]);
+        };
+
+        const handleReloadClick = () => {
+          window.location.reload();
+        };
+
+        return (
+          <React.Fragment>
+            <Typography variant='h3' component='h2' style={{ marginBottom: '0.5em', color: 'blue' }}>
+              Story Book
+            </Typography>
+
+            <form className={classes.root} noValidate autoComplete='off' onSubmit={handleSubmit}>
+              <TextField id='outlined-basic' label='Title' className={classes.titleText} variant='outlined' value={title} onChange={handleTitleChange} />
+              <TextField
+                className={classes.bodyText}
+                id='outlined-full-width'
+                label='Body'
+                placeholder='Body of the Book'
+                fullWidth
+                margin='normal'
+                InputLabelProps={{
+                  shrink: true,
+                }}
+                variant='outlined'
+                value={body}
+                onChange={handleBodyChange}
+              />
+              <Button variant='contained' color='primary' type='submit'>
+                Save
+              </Button>
+              <br />
+              <Button variant='contained' color='secondary' onClick={handleReloadClick}>
+                Reload
+              </Button>
+            </form>
+          </React.Fragment>
+        );
+      }
+      ReactDOM.render(<App />, rootHandle);
+    </script>
+  </body>
+</html>

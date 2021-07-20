@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Currency Converter</title>
+
+    <style>
+      .slidecontainer {
+        width: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script crossorigin src="https://unpkg.com/react@16/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+    <script crossorigin src="https://unpkg.com/babel-standalone@6.26.0/babel.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script type="text/babel">
+      /*
+                 1. Create a component called as MilesConvertor
+                 2. The component is responsible for converting miles to kms
+                 3. Provide a slider input field (hint type="range")
+                 4. When the user moves the slider, he / she controls the miles and you will need to compute and display the distance in kms.
+                 5. Set the max miles to 100
+              */
+      const rootHandle = document.querySelector('#root');
+      const { useState, useEffect } = React;
+
+      function MilesConvertor(props) {
+        const [slider, setSlider] = useState(1);
+        const [data, setData] = useState(0);
+
+        useEffect(() => {
+          axios.get('https://v6.exchangerate-api.com/v6/cbabf6fa9d6751c1a8e119b1/latest/USD').then((response) => {
+            const result = response.data;
+            console.log(result);
+            setData(result.conversion_rates.INR);
+          });
+        }, []);
+        const changeHandler = (e) => {
+          setSlider(e.target.value);
+        };
+        return (
+          <div>
+            <h1>Currrency Convertor</h1>
+            <hr />
+            <div className='slidecontainer'>
+              <h2>USD - {slider}</h2>
+              <h2>INR - {Number(slider * data).toFixed(4)}</h2>
+              <input type='range' min={1} max={100} value={slider} onChange={changeHandler} step='1' />
+              <p>Note: 1 USD= {data}</p>
+            </div>
+          </div>
+        );
+      }
+      ReactDOM.render(<MilesConvertor />, rootHandle);
+    </script>
+  </body>
+</html>

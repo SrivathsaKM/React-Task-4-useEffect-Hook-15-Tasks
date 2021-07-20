@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Users Table</title>
+    <script type="text/javascript" src="" charset="UTF-8"></script>
+  </head>
+  <body>
+    <div id="root"></div>
+
+    <script crossorigin src="https://unpkg.com/react@16/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+    <script crossorigin src="https://unpkg.com/babel-standalone@6.26.0/babel.js"></script>
+    <script crossorigin src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+    <script type="text/babel">
+      const rootHandle = document.getElementById('root');
+
+      const api = 'https://jsonplaceholder.typicode.com/users';
+
+      const { useState, useEffect } = React;
+
+      function Todos({ props }) {
+        const [user, setUser] = useState([]);
+        const [name, setName] = useState('');
+        const [status, setStatus] = useState(false);
+        //(no req) const [id, setId] = useState('');
+        const [task, setTask] = useState([]);
+
+        useEffect(() => {
+          axios.get(api).then((response) => {
+            const result = response.data;
+            setUser(result);
+          });
+        });
+
+        const handleNameChange = (e) => {
+          const result = e.target.value;
+          //(no req)   console.log(result);
+          setName(result);
+        };
+
+        // Write theses in useEffect
+        //setStatus(true);
+        //     axios.get(`https://jsonplaceholder.typicode.com/todos?userId=${id}`).then((response) => {
+        //       const taskResult = response.data;
+        //       console.log(taskResult);
+        //       setTask(taskResult);
+        //     });
+        //   }
+
+        useEffect(() => {
+          if (name) {
+            const userArr = user.filter((ele) => {
+              return name === ele.name;
+            });
+            // console.log(userArr);
+            const idValue = userArr
+              .map((ele) => {
+                return ele.id;
+              })
+              .join('');
+            //console.log(idValue);
+            // setId(idValue);
+
+            axios.get(`https://jsonplaceholder.typicode.com/todos?userId=${idValue}`).then((response) => {
+              const taskResult = response.data;
+              console.log(taskResult);
+              setTask(taskResult);
+              setStatus(true);
+            });
+          }
+        }, [name]);
+
+        return (
+          <div>
+            <form>
+              <label>User</label>
+              <select value={name} onChange={handleNameChange}>
+                <option value=''>Select User</option>
+                {user.map((ele) => {
+                  return (
+                    <option key={ele.id} value={ele.name}>
+                      {ele.name}
+                    </option>
+                  );
+                })}
+              </select>
+            </form>
+            {status && (
+              <div>
+                <ul>
+                  {task.map((ele) => {
+                    if (!ele.completed) {
+                      return <li key={ele.id}>{ele.title}</li>;
+                    } else {
+                      return (
+                        <li key={ele.id}>
+                          <strike>{ele.title}</strike>
+                        </li>
+                      );
+                    }
+                  })}
+                </ul>
+              </div>
+            )}
+          </div>
+        );
+      }
+
+      ReactDOM.render(<Todos />, rootHandle);
+    </script>
+  </body>
+</html>

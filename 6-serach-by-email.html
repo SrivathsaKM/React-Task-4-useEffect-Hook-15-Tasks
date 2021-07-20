@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Search By Email</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script crossorigin src="https://unpkg.com/react@16/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+    <script crossorigin src="https://unpkg.com/babel-standalone@6.26.0/babel.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="https://unpkg.com/@material-ui/core@latest/umd/material-ui.development.js"></script>
+    <script src="https://unpkg.com/@material-ui/core@latest/umd/material-ui.production.min.js"></script>
+    <script type="text/babel">
+      /*
+          1. The user is provided with a form, where he can input the user id and get the data from the API Server
+          2. Fetch only the user by the id from the provided API using the axios package.
+          3. Display it's data like the name, email and city below
+      */
+      const rootHandle = document.querySelector('#root');
+      const { useState, useEffect } = React;
+      const { makeStyles, Container, TextField, Button, Table, TableContainer, TableHead, TableCell, TableRow, TableBody, Paper, Typography } = MaterialUI;
+
+      const useStyles = makeStyles((theme) => ({
+        root: {
+          '& > *': {
+            margin: theme.spacing(0.5),
+            width: '25ch',
+          },
+        },
+      }));
+
+      function UserAllData(props) {
+        console.log(props.userData);
+
+        const { userData, classes, flag } = props;
+        return (
+          <React.Fragment>
+            <TableContainer component={Paper}>
+              <Table className={classes.table} aria-label='simple table'>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>#</TableCell>
+                    <TableCell align='left'>Name</TableCell>
+                    <TableCell align='left'>Email</TableCell>
+                    <TableCell align='left'>City</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {userData.map((user, idx) => {
+                    const { id, name, email, address } = user;
+                    // const { address } = user;
+
+                    return (
+                      <TableRow key={id}>
+                        <TableCell component='th' scope='row'>
+                          {id}
+                        </TableCell>
+                        <TableCell align='left'>{name}</TableCell>
+                        <TableCell align='left'>{email}</TableCell>
+                        <TableCell align='left'>{address.city}</TableCell>
+                        <TableCell align='left'></TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </React.Fragment>
+        );
+      }
+
+      function FetchUser() {
+        const [users, setUsers] = useState('');
+        const [usersList, setUsersList] = useState([]);
+        const [updatedData, setUpdatedData] = useState([]);
+        //const [flag, setFlag] = useState(false);
+        const [status, setStatus] = useState(false);
+
+        const classes = useStyles();
+
+        const handleChange = (e) => {
+          // console.log(e.target.value);
+          setUsers(e.target.value);
+        };
+
+        useEffect(() => {
+          axios.get(`https://jsonplaceholder.typicode.com/users/`).then((response) => {
+            const result = response.data;
+            setUsersList(result);
+            //setFlag(true);
+          });
+        }, []);
+
+        const handleSubmit = (e) => {
+          //  alert('hi');
+          e.preventDefault();
+          // axios
+          //   .get(`https://jsonplaceholder.typicode.com/users/`)
+          //   .then((response) => {
+          //     const result = response.data;
+          //     const nameData = result.filter((ele) => ele.email === users);
+          //     // console.log(nameData);
+          //     setUsersList(nameData);
+          //     setFlag(true);
+          //   })
+          //   .catch((error) => {
+          //     alert('error');
+          //     setFlag(false);
+          //   });
+
+          // console.log(usersList);
+          const nameData = usersList.filter((ele) => ele.email === users);
+          setUpdatedData(nameData);
+          //  setFlag(true);
+          setStatus(true);
+          // console.log(nameData);
+          setUsers('');
+        };
+
+        return (
+          <React.Fragment>
+            <form className={classes.root} noValidate autoComplete='off' onSubmit={handleSubmit}>
+              <TextField id='outlined-basic' label='Search Email' variant='outlined' type='text' value={users} onChange={handleChange} />
+              <Button variant='contained' color='primary' style={{ height: '4em', width: '5em' }} type='submit'>
+                Search
+              </Button>
+            </form>
+
+            {updatedData.length > 0 ? (
+              <UserAllData userData={updatedData} classes={classes} />
+            ) : status ? (
+              <Typography variant='h6' color='error'>
+                Invalid Email
+              </Typography>
+            ) : (
+              ''
+            )}
+          </React.Fragment>
+        );
+      }
+      ReactDOM.render(<FetchUser />, rootHandle);
+    </script>
+  </body>
+</html>

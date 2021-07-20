@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Diplay Selected Users Data</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script crossorigin src="https://unpkg.com/react@16/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+    <script crossorigin src="https://unpkg.com/babel-standalone@6.26.0/babel.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="https://unpkg.com/@material-ui/core@latest/umd/material-ui.development.js"></script>
+    <script src="https://unpkg.com/@material-ui/core@latest/umd/material-ui.production.min.js"></script>
+    <script type="text/babel">
+      /* 
+      1. Fetch all the users information from the provided API using the axios package
+      2. Display the data as options within a select tag
+      3. When a user selects one information, display it's data like the name, email and city below
+    */
+      const rootHandle = document.querySelector('#root');
+      const { useState, useEffect } = React;
+      const { InputLabel, NativeSelect, FormControl, TableContainer, Table, TableBody, TableRow, TableCell, Paper, TableHead } = MaterialUI;
+
+      function App() {
+        const [users, setUsers] = useState('');
+        const [usersList, setUsersList] = useState([]);
+
+        const handleSelectChange = (e) => {
+          setUsers(e.target.value);
+        };
+        useEffect(() => {
+          axios.get('https://jsonplaceholder.typicode.com/users').then((response) => {
+            const result = response.data;
+            console.log(result);
+            setUsersList(result);
+          });
+        }, []);
+        return (
+          <React.Fragment>
+            <FormControl>
+              <InputLabel shrink htmlFor='age-native-label-placeholder'>
+                Name
+              </InputLabel>
+              <NativeSelect
+                value={users}
+                onChange={handleSelectChange}
+                inputProps={{
+                  id: 'age-native-label-placeholder',
+                }}>
+                <option value='' disabled>
+                  Select One
+                </option>
+                {usersList.map((user) => {
+                  return (
+                    <option key={user.id} value={user.name}>
+                      {user.name}
+                    </option>
+                  );
+                })}
+              </NativeSelect>
+            </FormControl>
+
+            {usersList.map((user) => {
+              return (
+                user.name === users && (
+                  <TableContainer component={Paper} key={user.id}>
+                    <Table aria-label='simple table'>
+                      <TableHead>
+                        <TableRow>
+                          <TableCell>#</TableCell>
+                          <TableCell align='left'>Name</TableCell>
+                          <TableCell align='left'>Email</TableCell>
+                          <TableCell align='left'>City</TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        <TableRow>
+                          <TableCell align='left'>{user.id}</TableCell>
+                          <TableCell align='left'>{user.name}</TableCell>
+                          <TableCell align='left'>{user.email}</TableCell>
+                          <TableCell align='left'>{user.address.city}</TableCell>
+                        </TableRow>
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                )
+              );
+            })}
+          </React.Fragment>
+        );
+      }
+      ReactDOM.render(<App />, rootHandle);
+    </script>
+  </body>
+</html>

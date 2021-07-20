@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chnage background Color</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script crossorigin src="https://unpkg.com/react@16/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+    <script crossorigin src="https://unpkg.com/babel-standalone@6.26.0/babel.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="https://unpkg.com/@material-ui/core@latest/umd/material-ui.development.js"></script>
+    <script src="https://unpkg.com/@material-ui/core@latest/umd/material-ui.production.min.js"></script>
+    <script type="text/babel">
+      const rootHandle = document.querySelector('#root');
+      /*
+    1. You are provided with a list of colors
+    2. Display the colors in a drop down
+    3. When the user selects a color, change the background of the page to the selected colors.
+    4. The colors are red, green, yellow, black, pink, orange
+     */
+      const { useState, useEffect } = React;
+      const Allcolors = ['red', 'orange', 'pink', 'yellow', 'lightblue', 'lightgreen', 'cyan', 'grey', 'magenta', 'silver'];
+      function App() {
+        const [initialColor, setInitialColor] = useState('');
+        const [colors, setColors] = useState(Allcolors);
+        const { makeStyles, Typography, FormControl, InputLabel, NativeSelect } = MaterialUI;
+        const handleSelectChange = (e) => {
+          setInitialColor(e.target.value);
+        };
+
+        useEffect(() => {
+          document.body.style.backgroundColor = initialColor;
+        }, [initialColor]);
+
+        return (
+          <div>
+            <FormControl>
+              <InputLabel shrink htmlFor='age-native-label-placeholder'>
+                Country
+              </InputLabel>
+              <NativeSelect
+                value={initialColor}
+                onChange={handleSelectChange}
+                inputProps={{
+                  id: 'age-native-label-placeholder',
+                }}>
+                <option value='' disabled>
+                  Select One
+                </option>
+                {colors.map((color, idx) => {
+                  return (
+                    <option value={color} key={idx}>
+                      {color}
+                    </option>
+                  );
+                })}
+              </NativeSelect>
+            </FormControl>
+          </div>
+        );
+      }
+
+      ReactDOM.render(<App />, rootHandle);
+    </script>
+  </body>
+</html>
